@@ -15,10 +15,10 @@ def generate_launch_description():
         livox_package_path, "launch_ROS2", "msg_MID360_launch.py")
 
     # 获取 Fast-LIO 包的路径
-    fastlio_package_name = "fast_lio"
+    fastlio_package_name = "fastlio2"
     fastlio_package_path = get_package_share_directory(fastlio_package_name)
     fastlio_launch_path = os.path.join(
-        fastlio_package_path, "launch", "mapping.launch.py")
+        fastlio_package_path, "launch", "lio_launch.py")
 
     # 定义要启动的节点
 
@@ -32,7 +32,12 @@ def generate_launch_description():
         output='screen'
     )
     
-    position_publisher_node = ExecuteProcess(
+    tf_node = ExecuteProcess(
+        cmd=['ros2', 'run', 'fyt_pos', 'tf_listen'],
+        output='screen'
+    )
+    
+    pos_node = ExecuteProcess(
         cmd=['ros2', 'run', 'fyt_pos', 'radar_position'],
         output='screen'
     )
@@ -47,6 +52,10 @@ def generate_launch_description():
         output='screen'
     )
 
+    pr_node = ExecuteProcess(
+        cmd=['ros2', 'run', 'fyt_pos', 'path'],
+        output='screen'
+    )
     # 定义要包含的 launch 文件
 
     livox_launch = IncludeLaunchDescription(
@@ -64,9 +73,11 @@ def generate_launch_description():
     # 2. 启动感知算法节点
     ld.add_action(fastlio_launch)
     # 3. 启动定位和决策节点
-    ld.add_action(position_publisher_node)
+    ld.add_action(tf_node)
+    ld.add_action(pos_node)
     ld.add_action(aruco_node)
     ld.add_action(connect_node)
+    ld.add_action(pr_node)
     # 4. 最后启动执行节点
     ld.add_action(send_node)
     ld.add_action(recieve_node)

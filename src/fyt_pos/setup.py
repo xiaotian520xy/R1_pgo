@@ -20,9 +20,11 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'tf_listen = fyt_pos.tf_listen:main',
             'radar_position = fyt_pos.radar_position:main',
             'picture = fyt_pos.picture:main',
             'aruco = fyt_pos.aruco:main',
+            'path = fyt_pos.path:main',
         ],
     },
 )
