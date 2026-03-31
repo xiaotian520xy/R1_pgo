@@ -2,16 +2,18 @@ import rclpy
 from rclpy.node import Node
 import cv2
 import numpy as np
-from std_msgs.msg import Char
+from std_msgs.msg import Float64
 
 
 class ArucoDetect(Node):
     def __init__(self):
         super().__init__('aruco_detector')
-        self.connect_pub = self.create_publisher(Char, '/connect_aruco', 10)
+        self.connect_pub = self.create_publisher(Float64, '/connect_aruco', 10)
         self.timer = self.create_timer(0.01, self.timer_callback)
-        self.connect_flag = 0
-
+        self.connect_flag = 0.0
+        self.declare_parameter('target_x', 74.5)
+        self.target_x = self.get_parameter(
+        'target_x').get_parameter_value().double_value
         self.camera_matrix = np.array([
             [583.82315291, 0.0, 326.40372001],
             [0.0, 583.41565744, 239.04780154],
@@ -22,7 +24,7 @@ class ArucoDetect(Node):
             [-0.40268914, -0.00375917, -0.00145091, 0.00054633, 0.29353945],
             dtype=np.float32)
 
-        self.marker_length = 50  
+        self.marker_length = 65
 
         self.cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
         if not self.cap.isOpened():
@@ -94,15 +96,10 @@ class ArucoDetect(Node):
                             center_y = tvec[1]  # 上+下-
                             center_z = tvec[2]  # 前-后+
 
-                            if center_x > 2.5:
-                                self.connect_flag = 1
-                            elif center_x < 1.5:
-                                self.connect_flag = 2
-                            else:
-                                self.connect_flag = 3
+                            self.connect_flag = center_x - self.target_x
 
                             # 发布消息
-                            msg = Char()
+                            msg = Float64()
                             msg.data = self.connect_flag
                             self.connect_pub.publish(msg)
 
@@ -123,8 +120,8 @@ class ArucoDetect(Node):
                             break
 
             else:
-                self.connect_flag = 0
-                msg = Char()
+                self.connect_flag = 0.0
+                msg = Float64()
                 msg.data = self.connect_flag
                 self.connect_pub.publish(msg)
 

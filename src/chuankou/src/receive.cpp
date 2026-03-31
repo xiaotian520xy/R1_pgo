@@ -268,6 +268,7 @@ private:
                     auto r1_msg = std_msgs::msg::Char();
                     r1_msg.data = path[2];
                     R1_path_pub->publish(r1_msg);
+                    
                     path.clear();
                     R1Buffer.clear();
                     R2Buffer.clear();

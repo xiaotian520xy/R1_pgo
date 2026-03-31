@@ -8,6 +8,10 @@ import os
 
 def generate_launch_description():
 
+
+    package_path = get_package_share_directory('fyt_pos')
+    param_file = os.path.join(package_path, 'config', 'params.yaml')
+
     # 获取 Livox 驱动包的路径
     livox_package_name = "livox_ros_driver2"
     livox_package_path = get_package_share_directory(livox_package_name)
@@ -48,7 +52,8 @@ def generate_launch_description():
     )
     
     connect_node = ExecuteProcess(
-        cmd=['ros2', 'run', 'fyt_pos', 'aruco'],
+        cmd=['ros2', 'run', 'fyt_pos', 'aruco',
+             '--ros-args', '--params-file', param_file],
         output='screen'
     )
 

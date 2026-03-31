@@ -1,0 +1,4 @@
+# config/params.yaml
+aruco:
+  ros__parameters:
+    target_x: 74.5

@@ -60,16 +60,16 @@ class BasePositionPublisher(Node):
         t.header.stamp = self.get_clock().now().to_msg()
         t.header.frame_id = 'base_link'  # 父坐标系
         t.child_frame_id = 'camera_init'  # 子坐标系（雷达）
-
+ 
         # 雷达在车上的安装位置
-        t.transform.translation.x = 0.0102  # 前+后-
-        t.transform.translation.y = -0.4047  # 左+右-
-        t.transform.translation.z = 0.8413  # 高度
+        t.transform.translation.x = -0.20905 # 前+后-
+        t.transform.translation.y = 0.22553  # 左+右-
+        t.transform.translation.z = 0.64138  # 高度
 
         # 安装角度
         roll = 0.0  # 绕x轴旋转 (弧度)
         pitch = 0.0  # 绕y轴旋转 (弧度)
-        yaw = math.radians(0)  # 绕z轴旋转（角度）
+        yaw = math.radians(91.2)  # 绕z轴旋转（角度）
 
         q = quaternion_from_euler(roll, pitch, yaw)
         t.transform.rotation.x = q[0]

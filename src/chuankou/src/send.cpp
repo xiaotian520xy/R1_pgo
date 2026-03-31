@@ -23,10 +23,10 @@ public:
         position_sub_ = this->create_subscription<geometry_msgs::msg::Point>(
             "/r2_position", 10,
             std::bind(&CombinedPublisher::position_callback, this, std::placeholders::_1));
-        yaw_sub_ = this->create_subscription<std_msgs::msg::Float64>(
+        /*yaw_sub_ = this->create_subscription<std_msgs::msg::Float64>(
             "/now_yaw", 10,
-            std::bind(&CombinedPublisher::yaw_callback, this, std::placeholders::_1));
-        aruco_sub_ = this->create_subscription<std_msgs::msg::Char>(
+            std::bind(&CombinedPublisher::yaw_callback, this, std::placeholders::_1));*/
+        aruco_sub_ = this->create_subscription<std_msgs::msg::Float64>(
             "/connect_aruco", 10,
             std::bind(&CombinedPublisher::connect_callback, this, std::placeholders::_1));
         R1_path_sub_ = this->create_subscription<std_msgs::msg::Char>(
@@ -49,8 +49,8 @@ private:
         float position_x = 0.0;
         float position_y = 0.0;
         float position_z = 0.0;
-        float yaw = 0.0;
-        uint8_t connect = 0;
+        //float yaw = 0.0;
+        float connect = 0.0;
         uint8_t R1_path = 0;
         bool restart_flag = true;
     };
@@ -112,15 +112,16 @@ private:
         data_.position_x = msg->x;
         data_.position_y = msg->y;
         data_.position_z = msg->z;
+        send_data_to_serial();
     }
-
+    /*
     void yaw_callback(const std_msgs::msg::Float64::SharedPtr msg)
     {
         std::lock_guard<std::mutex> lock(mutex_);
         data_.yaw = msg->data;
     }
-
-    void connect_callback(const std_msgs::msg::Char::SharedPtr msg)
+    */
+    void connect_callback(const std_msgs::msg::Float64::SharedPtr msg)
     {
         std::lock_guard<std::mutex> lock(mutex_);
         data_.connect = msg->data;
@@ -129,6 +130,7 @@ private:
     void R1_path_callback(const std_msgs::msg::Char::SharedPtr msg)
     {
         std::lock_guard<std::mutex> lock(mutex_);
+
         data_.R1_path = msg->data;
     }
 
@@ -167,7 +169,7 @@ private:
             }
         }
 
-        std::array<uint8_t, 22> frame;
+        std::array<uint8_t, 21> frame;
         frame[0] = 0xFF;
 
         size_t offset = 1;
@@ -183,8 +185,7 @@ private:
         copy_float(data_.position_x);
         copy_float(data_.position_y);
         copy_float(data_.position_z);
-        copy_float(data_.yaw);
-        frame[offset++] = data_.connect;
+        copy_float(data_.connect);
         frame[offset++] = data_.R1_path;
         frame[offset++] = data_.restart_flag;
 
@@ -203,8 +204,8 @@ private:
             {
                 serial_port_.write(frame.data(), frame.size());
 
-                RCLCPP_INFO(this->get_logger(), "Sent data: x=%.5f, y=%.5f, z=%.5f, yaw=%.5f, connect=%d, r1_path=%d, restart=%d",
-                            data_.position_x, data_.position_y, data_.position_z, data_.yaw,
+                RCLCPP_INFO(this->get_logger(), "Sent data: x=%.5f, y=%.5f, z=%.5f, connect=%.1f, r1_path=%d, restart=%d",
+                            data_.position_x, data_.position_y, data_.position_z,
                             data_.connect, data_.R1_path, data_.restart_flag);
             }
             catch (const std::exception &e)
@@ -216,8 +217,8 @@ private:
     }
 
     rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr position_sub_;
-    rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr yaw_sub_;
-    rclcpp::Subscription<std_msgs::msg::Char>::SharedPtr aruco_sub_;
+    //rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr yaw_sub_;
+    rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr aruco_sub_;
     rclcpp::Subscription<std_msgs::msg::Char>::SharedPtr R1_path_sub_;
     rclcpp::TimerBase::SharedPtr timer_;
     serial::Serial serial_port_;

@@ -14,7 +14,7 @@ class SendPath(Node):
         super().__init__('send_path')
         self.path_data = None
         self.display_flag = False
-        self.window_size = (500, 500)  # 固定窗口大小
+        self.window_size = (600, 600)  # 固定窗口大小
 
         self.path_sub = self.create_subscription(
             IntArray,
@@ -148,7 +148,7 @@ class SendPath(Node):
             self.root.update_idletasks()
             screen_width = self.root.winfo_screenwidth()
             screen_height = self.root.winfo_screenheight()
-            x = (screen_width - self.window_size[0]) // 2
+            x = (screen_width - self.window_size[0]) // 2 + 150
             y = (screen_height - self.window_size[1]) // 2
             self.root.geometry(
                 f"{self.window_size[0]}x{self.window_size[1]}+{x}+{y}")
