@@ -11,7 +11,7 @@ class ArucoDetect(Node):
         self.connect_pub = self.create_publisher(Float64, '/connect_aruco', 10)
         self.timer = self.create_timer(0.01, self.timer_callback)
         self.connect_flag = 0.0
-        self.declare_parameter('target_x', 74.5)
+        self.declare_parameter('target_x', 77.5)
         self.target_x = self.get_parameter(
         'target_x').get_parameter_value().double_value
         self.camera_matrix = np.array([

@@ -155,17 +155,13 @@ private:
             {
                 return 3;
             }
-            else if (dif == -1)
+            else if (dif == -1 && r2_path == 1)
             {
                 return 2;
             }
-            else if (dif == -2 || dif % 3 == 1)
-            {
-                return 1;
-            }
             else
             {
-                return 0;
+                return 1;
             }
         }
     }

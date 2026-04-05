@@ -52,6 +52,8 @@ private:
         //float yaw = 0.0;
         float connect = 0.0;
         uint8_t R1_path = 0;
+        uint8_t new_r1 = 0;
+        uint8_t old_r1 = 0;
         bool restart_flag = true;
     };
 
@@ -130,8 +132,8 @@ private:
     void R1_path_callback(const std_msgs::msg::Char::SharedPtr msg)
     {
         std::lock_guard<std::mutex> lock(mutex_);
-
         data_.R1_path = msg->data;
+        data_.new_r1 = 1;
     }
 
     // 定时器回调
@@ -203,10 +205,19 @@ private:
             try
             {
                 serial_port_.write(frame.data(), frame.size());
-
-                RCLCPP_INFO(this->get_logger(), "Sent data: x=%.5f, y=%.5f, z=%.5f, connect=%.1f, r1_path=%d, restart=%d",
-                            data_.position_x, data_.position_y, data_.position_z,
-                            data_.connect, data_.R1_path, data_.restart_flag);
+                
+                if (data_.new_r1 != 0)
+                {
+                    data_.new_r1++;
+                    if(data_.new_r1 > 10){
+                        data_.old_r1 = data_.R1_path;
+                        data_.R1_path = 0;
+                        data_.new_r1 = 0;
+                    }
+                }
+                    RCLCPP_INFO(this->get_logger(), "Sent data: x=%.5f, y=%.5f, z=%.5f, connect=%.1f, r1_path=%d, restart=%d",
+                                data_.position_x, data_.position_y, data_.position_z,
+                                data_.connect, data_.old_r1, data_.restart_flag);
             }
             catch (const std::exception &e)
             {

@@ -59,7 +59,7 @@ class BasePositionPublisher(Node):
         t = TransformStamped()
         t.header.stamp = self.get_clock().now().to_msg()
         t.header.frame_id = 'base_link'  # 父坐标系
-        t.child_frame_id = 'camera_init'  # 子坐标系（雷达）
+        t.child_frame_id = 'lidar'  # 子坐标系（雷达）
  
         # 雷达在车上的安装位置
         t.transform.translation.x = -0.20905 # 前+后-
@@ -87,7 +87,7 @@ class BasePositionPublisher(Node):
             # 拿静态外参：base_link -> camera_init
             t = self.tf_buffer.lookup_transform(
                 'base_link',
-                'camera_init',
+                'lidar',
                 rclpy.time.Time()
             )
         except Exception as e:
